@@ -11,12 +11,15 @@ import { keyBy } from "lodash";
 })
 export class PatientListFiltersComponent implements OnInit {
   @Input() filterCategories: any[];
+  @Input() filterRadiology: any[];
   filterCategoriesOptions$: Observable<any>;
+  filterRadiologyOptions$:Observable<any>;
   filterParameters: any[] = [];
   filterList: any[] = [];
+  filterParameters2: any[] = [];
+  filterList2: any[] = [];
 
   @Output() onFilterChanged = new EventEmitter<any>();
-
   constructor(private conceptService: ConceptsService) {}
 
   ngOnInit(): void {
@@ -24,6 +27,19 @@ export class PatientListFiltersComponent implements OnInit {
       ...this.filterCategories?.map((category) =>
         this.conceptService.getConceptDetailsByUuid(
           category?.value,
+          "custom:(uuid,display,setMembers:(uuid,display))"
+        )
+      )
+    ).pipe(
+      map((response) => {
+        return keyBy(response, "uuid");
+      })
+    );
+
+    this.filterRadiologyOptions$ = zip(
+      ...this.filterRadiology?.map((radiology) =>
+        this.conceptService.getConceptDetailsByUuid(
+          radiology?.value,
           "custom:(uuid,display,setMembers:(uuid,display))"
         )
       )
@@ -110,6 +126,7 @@ export class PatientListFiltersComponent implements OnInit {
       }
     });
 
+   
     // Construct the filter statement string to be emmited
     let parametersString = "";
     this.filterParameters.map(
@@ -132,3 +149,6 @@ export class PatientListFiltersComponent implements OnInit {
     return stringList;
   }
 }
+
+
+
