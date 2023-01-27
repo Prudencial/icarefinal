@@ -126,7 +126,66 @@ export class PatientListFiltersComponent implements OnInit {
       }
     });
 
-   
+    // construct a filters strings list
+    this.filterList?.map((filter) => {
+      // check if a value is selected and not the all option
+      if (filter?.value && filter?.filterIndex === event?.value?.filterIndex) {
+        if (
+          filter?.value?.display === "ultrasound" ||
+          filter?.value?.display === "xray"
+        ) {
+          var searchPattern = new RegExp("^&radiologytype=");
+
+          this.filterParameters = this.filterOutStringFromStringList(
+            this.filterParameters,
+            searchPattern
+          );
+
+          this.filterParameters = [
+            ...this.filterParameters,
+            `&radiologytype=${filter?.value?.display}`,
+          ];
+        }
+      }
+
+      if (
+        filter?.value &&
+        filter?.value?.display !== "ultrasound" &&
+        filter?.value?.display !== "xray"
+      ) {
+        var searchPattern = new RegExp("^&attributeValueReference2=");
+
+        this.filterParameters = this.filterOutStringFromStringList(
+          this.filterParameters,
+          searchPattern
+        );
+
+        this.filterParameters = [
+          ...this.filterParameters,
+          `&attributeValueReference2=${filter?.value?.uuid}`,
+        ];
+      }
+
+      // remove one filter statement from the list All selected
+      if (!filter?.value && filter?.filterIndex === 0) {
+        // use function filterOutStringFromStringList to remove filter parameter from the list of parameters
+        var searchPattern = new RegExp("^&radiologytype=");
+        this.filterParameters = this.filterOutStringFromStringList(
+          this.filterParameters,
+          searchPattern
+        );
+      }
+
+      if (!filter?.value && filter?.filterIndex === 1) {
+        // use function filterOutStringFromStringList to remove filter parameter from the list of parameters
+        var searchPattern = new RegExp("^&attributeValueReference2=");
+        this.filterParameters = this.filterOutStringFromStringList(
+          this.filterParameters,
+          searchPattern
+        );
+      }
+    });
+
     // Construct the filter statement string to be emmited
     let parametersString = "";
     this.filterParameters.map(
